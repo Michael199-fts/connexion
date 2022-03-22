@@ -1,7 +1,8 @@
 from django.urls import path
 
-from api.views import RegistrationAPIView
+from api.views import RegistrationAPIView, MatchAPIView
 
 urlpatterns = [
-    path('registration/', RegistrationAPIView.as_view(), name='Регистрация'),
+    path('reg/', RegistrationAPIView.as_view(), name='Регистрация'),
+    path('match/', MatchAPIView.as_view(), name='Симпатия')
 ]
