@@ -1,23 +1,25 @@
-import pdb
+from PIL import Image, ImageDraw, ImageFont
+from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListCreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api.models import Sympaty, Participant
-from api.serializers import RegistrationSerializer, MatchSerializer
+from api.serializers import RegistrationSerializer, MatchSerializer, ParticipantSerializer
+from api.service import ServiceOutcome
+from api.services.users.auth import AuthUserService
+from api.services.users.registrated import RegisterUserService
+
 
 class RegistrationAPIView(CreateAPIView):
     permission_classes = [AllowAny]
-    serializer_class = RegistrationSerializer
 
     def post(self, request, *args, **kwargs):
-        #avatar = Image.open(request.data['photo'])
-        #draw = ImageDraw.Draw(avatar)
-        #font = ImageFont.truetype("arial.ttf", size=60)
-        #draw.text((40, 40), 'connexionWM', font=font)
-        #avatar.save('photos/'+request.FILES['photo'].name)
-        #request.data['photo'] = 'photos/'+request.FILES['photo'].name
-        return self.create(request, *args, **kwargs)
+        service_outcome = ServiceOutcome(RegisterUserService, {**dict(request.data.items())}, request.FILES.dict())
+        if bool(service_outcome.errors):
+            return Response(service_outcome.errors, service_outcome.response_status or status.HTTP_400_BAD_REQUEST)
+        return Response(ParticipantSerializer(service_outcome.result).data, status=status.HTTP_201_CREATED)
 
 class MatchAPIView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -25,6 +27,8 @@ class MatchAPIView(ListCreateAPIView):
     queryset = Sympaty.objects.all()
 
     def post(self, request, *args, **kwargs):
+        import pdb
+        pdb.set_trace()
         try:
             if request.data['sender'] == Sympaty.objects.get(sender = request.data['sender'])\
                 and request.data['addressee'] == Sympaty.objects.get(addressee = request.data['addressee']):
@@ -52,3 +56,12 @@ class MatchAPIView(ListCreateAPIView):
         except:
             return Response('Симпатия отправлена! Ждите ответной симпатии от участника, exp',
                             headers=headers)
+
+class AuthenticationAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        service_outcome = ServiceOutcome(AuthUserService, request.data)
+        if bool(service_outcome.errors):
+            return Response(service_outcome.errors, service_outcome.response_status or status.HTTP_400_BAD_REQUEST)
+        return Response(service_outcome.result, status=status.HTTP_200_OK)

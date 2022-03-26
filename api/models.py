@@ -1,5 +1,11 @@
+from io import BytesIO
+
+from PIL import Image, ImageDraw, ImageFont
+from django.core.files.base import ContentFile
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Participant(AbstractUser):
@@ -25,6 +31,26 @@ class Participant(AbstractUser):
     username = \
         models.CharField(max_length=150, unique=True, verbose_name='никнэйм')
 
+@receiver(post_save, sender=Participant)
+def make_watermark(sender, instance=None, created=None, **kwargs):
+    update_fields = kwargs.get('update_fields')
+    if not update_fields:
+        update_fields = frozenset()
+    if created or 'photo' in update_fields:
+        avatar = Image.open(instance.photo)
+        draw = ImageDraw.Draw(avatar)
+        font = ImageFont.truetype('api/Graphik-Regular-Web.ttf', size=150)
+        draw.text((40, 40), 'connexionWM', font=font)
+        new_image_io = BytesIO()
+        avatar.save(new_image_io, format='PNG')
+
+        temp_name = f"{instance.photo.name}"
+        instance.photo.save(
+            temp_name,
+            content=ContentFile(new_image_io.getvalue()),
+            save=False
+        )
+        instance.save()
 
 class Sympaty(models.Model):
     class Meta:
