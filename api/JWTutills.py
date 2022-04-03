@@ -9,12 +9,9 @@ def authorization(username, password):
         payload = jwt_payload_handler(user)
         response = jwt_response_payload_handler(jwt_encode_handler(payload), user)
 
-
         return response
 
 def find_user(username, password):
-    import pdb
-    pdb.set_trace()
     try:
         user = Participant.objects.get(username=username)
         check = user.check_password(password)
