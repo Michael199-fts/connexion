@@ -3,13 +3,14 @@ from rest_framework import permissions
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
-from api.views import RegistrationAPIView, MatchAPIView, AuthenticationAPIView
+from api.views import RegistrationAPIView, MatchAPIView, AuthenticationAPIView, ParticipantsListAPIView
 from connexion.settings import BASE_URL
 
 urlpatterns = [
     path('reg/', RegistrationAPIView.as_view(), name='Регистрация'),
     path('match/', MatchAPIView.as_view(), name='Симпатия'),
     path('auth/', AuthenticationAPIView.as_view(), name='Аутентификация'),
+    path('list/', ParticipantsListAPIView.as_view(), name='Список участников')
 ]
 
 schema_view = get_schema_view(
