@@ -40,9 +40,8 @@ class AuthenticationAPIView(APIView):
 
 class ParticipantsListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
-
     def get(self, request, *args, **kwargs):
-        service_outcome = ServiceOutcome(ParticipantsListService, request.query_params)
+        service_outcome = ServiceOutcome(ParticipantsListService, {'user':request.user, **request.query_params})
         if bool(service_outcome.errors):
             return Response(service_outcome.errors, service_outcome.response_status or status.HTTP_400_BAD_REQUEST)
         return Response(ParticipantsListSerializer(service_outcome.result, many=True).data, service_outcome.response_status)

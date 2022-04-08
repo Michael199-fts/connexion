@@ -23,7 +23,9 @@ class RegisterUserService(Service):
             sex=self.cleaned_data.get('sex'),
             email=self.cleaned_data.get('email'),
             password=make_password(self.cleaned_data.get('password')),
-            photo=self.cleaned_data.get('photo')
+            photo=self.cleaned_data.get('photo'),
+            latitude=self.cleaned_data.get('latitude'),
+            longitude=self.cleaned_data.get('longitude')
         )
 
     def check(self):

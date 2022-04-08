@@ -30,6 +30,10 @@ class Participant(AbstractUser):
         models.CharField(max_length=2, choices=SEX_CHOICES, verbose_name='пол')
     username = \
         models.CharField(max_length=150, unique=True, verbose_name='никнэйм')
+    latitude = \
+        models.CharField(max_length=15, unique=False, default=55.4507, verbose_name='широта')
+    longitude = \
+        models.CharField(max_length=15, unique=False, default=37.3656, verbose_name='долгота')
 
 @receiver(post_save, sender=Participant)
 def make_watermark(sender, instance=None, created=None, **kwargs):
