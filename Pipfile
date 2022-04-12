@@ -4,10 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
+django = "3.2"
 pillow = "*"
 numpy = "*"
 django-rest = "*"
+djangorestframework-jwt = "*"
+pyjwt = "1.7.1"
+django-imagekit = "*"
+jinja2 = "*"
+drf-yasg = "*"
 
 [dev-packages]
 

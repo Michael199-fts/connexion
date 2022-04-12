@@ -1,14 +1,15 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.serializers import MatchSerializer, ParticipantSerializer, ParticipantsListSerializer
 from api.service import ServiceOutcome
-from api.services.users.auth import AuthUserService
-from api.services.users.match import MatchService
-from api.services.users.participants_list import ParticipantsListService
-from api.services.users.registrated import RegisterUserService
+from api.services.users.authentication_service import AuthUserService
+from api.services.users.patch_service import PatchUserService
+from api.services.users.sympaty_create_service import MatchService
+from api.services.users.participants_list_service import ParticipantsListService
+from api.services.users.registration_service import RegisterUserService
 
 
 class RegistrationAPIView(CreateAPIView):
@@ -19,6 +20,17 @@ class RegistrationAPIView(CreateAPIView):
         if bool(service_outcome.errors):
             return Response(service_outcome.errors, service_outcome.response_status or status.HTTP_400_BAD_REQUEST)
         return Response(ParticipantSerializer(service_outcome.result).data, status=status.HTTP_201_CREATED)
+
+class PatchUpdateParticipantAPIView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, *args, **kwargs):
+        service_outcome = ServiceOutcome(PatchUserService, {'user':request.user,
+                                                               **dict(request.data.items())}, request.FILES.dict())
+        if bool(service_outcome.errors):
+            return Response(service_outcome.errors, service_outcome.response_status or status.HTTP_400_BAD_REQUEST)
+        return Response(ParticipantSerializer(service_outcome.result).data, status=status.HTTP_200_OK)
+
 
 class MatchAPIView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]

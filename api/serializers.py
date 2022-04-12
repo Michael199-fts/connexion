@@ -1,7 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from api.models import Participant, Sympaty
-from api.services.users.participants_list import cum
 from connexion.settings import BASE_URL
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -35,6 +34,8 @@ class ParticipantsListSerializer(serializers.ModelSerializer):
         if instance.photo:
             return f"{BASE_URL}{instance.photo.url}"
         return ""
+
+
     class Meta:
         model = Participant
-        fields = ('username', 'first_name', 'last_name', 'sex', 'photo', 'distance')
+        fields = ('username', 'first_name', 'last_name', 'sex', 'photo')
